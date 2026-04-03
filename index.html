@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM行业投研 - 大模型厂商分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --card: #1a1d29;
+            --border: #2a2d3a;
+            --text: #e4e4e7;
+            --text-dim: #9ca3af;
+            --accent: #6366f1;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        header {
+            text-align: center;
+            padding: 32px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+        }
+        header h1 { font-size: 28px; font-weight: 700; }
+        header p { color: var(--text-dim); margin-top: 8px; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .card h2 { font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .card h3 { font-size: 14px; color: var(--text-dim); margin-bottom: 12px; font-weight: 500; }
+        .price-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .price { font-size: 36px; font-weight: 700; }
+        .change { font-size: 16px; font-weight: 600; padding: 4px 10px; border-radius: 6px; }
+        .change.up { background: rgba(34,197,94,0.15); color: var(--green); }
+        .change.down { background: rgba(239,68,68,0.15); color: var(--red); }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+        .stat { text-align: center; }
+        .stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 16px; font-weight: 600; margin-top: 2px; }
+        .chart-container { position: relative; height: 280px; margin-top: 16px; }
+        .full-width { grid-column: 1 / -1; }
+        .predictions-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .predictions-table th {
+            text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border);
+            color: var(--text-dim); font-weight: 500; font-size: 12px; text-transform: uppercase;
+        }
+        .predictions-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;
+        }
+        .badge-up { background: rgba(34,197,94,0.15); color: var(--green); }
+        .badge-down { background: rgba(239,68,68,0.15); color: var(--red); }
+        .badge-flat { background: rgba(245,158,11,0.15); color: var(--orange); }
+        .badge-active { background: rgba(99,102,241,0.15); color: var(--accent); }
+        .confidence-bar {
+            width: 60px; height: 6px; background: var(--border); border-radius: 3px; display: inline-block;
+            position: relative; vertical-align: middle;
+        }
+        .confidence-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+        .company-info { font-size: 13px; color: var(--text-dim); line-height: 1.8; }
+        .company-info strong { color: var(--text); }
+        .update-time { text-align: center; color: var(--text-dim); font-size: 12px; margin-top: 24px; }
+        .tag { display: inline-block; background: var(--border); color: var(--text-dim); padding: 2px 8px; border-radius: 4px; font-size: 11px; margin: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LLM 行业投研仪表��</h1>
+            <p>专注中国大模型厂商产业链 · Minimax (0100.HK) · 智谱 (2513.HK)</p>
+        </header>
+
+        <div class="grid">
+            <!-- Minimax Card -->
+            <div class="card" id="minimax-card">
+                <h2>MiniMax Group <span class="tag">0100.HK</span></h2>
+                <div class="price-header">
+                    <div class="price" id="minimax-price">--</div>
+                    <div class="change" id="minimax-change">--</div>
+                </div>
+                <div class="stats">
+                    <div class="stat"><div class="stat-label">最高</div><div class="stat-value" id="minimax-high">--</div></div>
+                    <div class="stat"><div class="stat-label">���低</div><div class="stat-value" id="minimax-low">--</div></div>
+                    <div class="stat"><div class="stat-label">成交量</div><div class="stat-value" id="minimax-vol">--</div></div>
+                </div>
+                <div class="chart-container"><canvas id="minimax-chart"></canvas></div>
+            </div>
+
+            <!-- Zhipu Card -->
+            <div class="card" id="zhipu-card">
+                <h2>智谱 AI <span class="tag">2513.HK</span></h2>
+                <div class="price-header">
+                    <div class="price" id="zhipu-price">--</div>
+                    <div class="change" id="zhipu-change">--</div>
+                </div>
+                <div class="stats">
+                    <div class="stat"><div class="stat-label">最高</div><div class="stat-value" id="zhipu-high">--</div></div>
+                    <div class="stat"><div class="stat-label">最低</div><div class="stat-value" id="zhipu-low">--</div></div>
+                    <div class="stat"><div class="stat-label">成交量</div><div class="stat-value" id="zhipu-vol">--</div></div>
+                </div>
+                <div class="chart-container"><canvas id="zhipu-chart"></canvas></div>
+            </div>
+
+            <!-- Company Profiles -->
+            <div class="card">
+                <h2>MiniMax 公司概况</h2>
+                <div class="company-info">
+                    <strong>上市日期：</strong>2026年1月9日 (港股)<br>
+                    <strong>发行价：</strong>HK$165<br>
+                    <strong>FY2025营收：</strong>US$7,900万 (+158.9% YoY)<br>
+                    <strong>毛利率：</strong>25.4% (同比提升13.4pp)<br>
+                    <strong>现金储备：</strong>US$10.5亿<br>
+                    <strong>全球用户：</strong>2.36亿，覆盖200+国家<br>
+                    <strong>企业客户：</strong>21.4万<br>
+                    <strong>核心产品：</strong>Hailuo AI (视频), Talkie (社交), MiniMax Agent<br>
+                    <strong>最新模型：</strong>M2.5 (2026年2月发布，效率提升37%)<br>
+                    <strong>下次财报：</strong>~2026年5月7日<br>
+                    <strong>分析师共识：</strong>买入 (7位分析师)，目标价 HK$1,055
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>智谱 AI 公司概况</h2>
+                <div class="company-info">
+                    <strong>上市日期：</strong>2026年1月7日 (港股)<br>
+                    <strong>发行价：</strong>HK$116.20<br>
+                    <strong>FY2025营���：</strong>7.24亿元 (+131.9% YoY)<br>
+                    <strong>净亏损：</strong>47.2亿元 (研发投入大)<br>
+                    <strong>市值：</strong>~HK$2,560亿<br>
+                    <strong>核心产品：</strong>GLM-5 (744B MoE), ChatGLM, API平台<br>
+                    <strong>最新模型：</strong>GLM-5V-Turbo (多模态，2026年4月)<br>
+                    <strong>关键叙事：</strong>华为昇腾芯片训练，国产AI供应链<br>
+                    <strong>定价能力：</strong>API涨价80%未影响需求<br>
+                    <strong>分析师：</strong>JPM 增持 目标HK$400; 海通 跑赢 目标HK$860
+                </div>
+            </div>
+
+            <!-- Predictions -->
+            <div class="card full-width">
+                <h2>预测追踪</h2>
+                <h3>所有预测记录及追踪状态</h3>
+                <table class="predictions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>标的</th>
+                            <th>方向</th>
+                            <th>幅度</th>
+                            <th>周期</th>
+                            <th>置信度</th>
+                            <th>入场价</th>
+                            <th>状态</th>
+                            <th>理由</th>
+                        </tr>
+                    </thead>
+                    <tbody id="predictions-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="update-time">
+            数据更新时间: 2026-04-02 · 由 LLM-Industry-Analyst Agent 自动维护
+        </div>
+    </div>
+
+    <script>
+        // Stock data (will be loaded from JSON files in production)
+        const minimaxData = [{"date": "2026-03-03", "open": 1126.0, "close": 1100.0, "high": 1145.0, "low": 1088.0, "volume": 1163891.0, "turnover": 1297846000.0, "amplitude": 5.15, "pct_change": -1.34, "change": -15.0, "turnover_rate": 0.5}, {"date": "2026-03-04", "open": 1090.0, "close": 1090.0, "high": 1110.0, "low": 1070.0, "volume": 833023.0, "turnover": 910783000.0, "amplitude": 3.64, "pct_change": -0.91, "change": -10.0, "turnover_rate": 0.36}, {"date": "2026-03-05", "open": 1098.0, "close": 1103.0, "high": 1113.0, "low": 1061.0, "volume": 839720.0, "turnover": 914429000.0, "amplitude": 4.77, "pct_change": 1.19, "change": 13.0, "turnover_rate": 0.36}, {"date": "2026-03-06", "open": 1113.0, "close": 1093.0, "high": 1116.0, "low": 1080.0, "volume": 518734.0, "turnover": 572041000.0, "amplitude": 3.26, "pct_change": -0.91, "change": -10.0, "turnover_rate": 0.22}, {"date": "2026-03-07", "open": 1116.0, "close": 1162.0, "high": 1162.0, "low": 1106.0, "volume": 760025.0, "turnover": 867949000.0, "amplitude": 5.12, "pct_change": 6.31, "change": 69.0, "turnover_rate": 0.33}, {"date": "2026-03-10", "open": 1198.0, "close": 1320.0, "high": 1330.0, "low": 1187.0, "volume": 3016449.0, "turnover": 3883103000.0, "amplitude": 12.31, "pct_change": 13.6, "change": 158.0, "turnover_rate": 1.3}, {"date": "2026-03-11", "open": 1240.0, "close": 1213.0, "high": 1250.0, "low": 1161.0, "volume": 2112889.0, "turnover": 2492310000.0, "amplitude": 6.74, "pct_change": -8.11, "change": -107.0, "turnover_rate": 0.91}, {"date": "2026-03-12", "open": 1143.0, "close": 1104.0, "high": 1170.0, "low": 1060.0, "volume": 2186989.0, "turnover": 2385858000.0, "amplitude": 9.07, "pct_change": -8.99, "change": -109.0, "turnover_rate": 0.94}, {"date": "2026-03-13", "open": 1105.0, "close": 1099.0, "high": 1132.0, "low": 1093.0, "volume": 819917.0, "turnover": 916236000.0, "amplitude": 3.53, "pct_change": -0.45, "change": -5.0, "turnover_rate": 0.35}, {"date": "2026-03-14", "open": 1100.0, "close": 1045.0, "high": 1119.0, "low": 1032.0, "volume": 879992.0, "turnover": 943627000.0, "amplitude": 7.92, "pct_change": -4.91, "change": -54.0, "turnover_rate": 0.38}, {"date": "2026-03-17", "open": 1042.0, "close": 1082.0, "high": 1089.0, "low": 1023.0, "volume": 816479.0, "turnover": 868361000.0, "amplitude": 6.32, "pct_change": 3.54, "change": 37.0, "turnover_rate": 0.35}, {"date": "2026-03-18", "open": 1078.0, "close": 1066.0, "high": 1084.0, "low": 1051.0, "volume": 508389.0, "turnover": 544069000.0, "amplitude": 3.05, "pct_change": -1.48, "change": -16.0, "turnover_rate": 0.22}, {"date": "2026-03-19", "open": 1075.0, "close": 1066.0, "high": 1076.0, "low": 1020.0, "volume": 698282.0, "turnover": 726437000.0, "amplitude": 5.25, "pct_change": 0.0, "change": 0.0, "turnover_rate": 0.3}, {"date": "2026-03-20", "open": 1115.0, "close": 1009.0, "high": 1127.0, "low": 998.0, "volume": 1306380.0, "turnover": 1365629000.0, "amplitude": 12.1, "pct_change": -5.35, "change": -57.0, "turnover_rate": 0.56}, {"date": "2026-03-23", "open": 995.0, "close": 916.5, "high": 1048.0, "low": 900.0, "volume": 2078676.0, "turnover": 1977342000.0, "amplitude": 14.67, "pct_change": -9.17, "change": -92.5, "turnover_rate": 0.89}, {"date": "2026-03-24", "open": 964.5, "close": 1030.0, "high": 1032.0, "low": 933.5, "volume": 1683910.0, "turnover": 1656935000.0, "amplitude": 10.75, "pct_change": 12.38, "change": 113.5, "turnover_rate": 0.72}, {"date": "2026-03-25", "open": 1060.0, "close": 1079.0, "high": 1098.0, "low": 1000.0, "volume": 2008355.0, "turnover": 2112910000.0, "amplitude": 9.51, "pct_change": 4.76, "change": 49.0, "turnover_rate": 0.86}, {"date": "2026-03-26", "open": 1100.0, "close": 986.0, "high": 1117.0, "low": 979.0, "volume": 1188866.0, "turnover": 1222248000.0, "amplitude": 12.79, "pct_change": -8.62, "change": -93.0, "turnover_rate": 0.51}, {"date": "2026-03-27", "open": 985.0, "close": 990.0, "high": 990.0, "low": 920.0, "volume": 1153226.0, "turnover": 1099508000.0, "amplitude": 7.1, "pct_change": 0.41, "change": 4.0, "turnover_rate": 0.5}, {"date": "2026-03-30", "open": 949.0, "close": 1014.0, "high": 1048.0, "low": 920.0, "volume": 1000772.0, "turnover": 995136000.0, "amplitude": 12.93, "pct_change": 2.42, "change": 24.0, "turnover_rate": 0.43}, {"date": "2026-03-31", "open": 990.0, "close": 929.5, "high": 1040.0, "low": 920.0, "volume": 1295562.0, "turnover": 1241742000.0, "amplitude": 11.83, "pct_change": -8.33, "change": -84.5, "turnover_rate": 0.56}, {"date": "2026-04-01", "open": 1020.0, "close": 1060.0, "high": 1104.0, "low": 990.0, "volume": 2830960.0, "turnover": 2984034000.0, "amplitude": 12.26, "pct_change": 14.04, "change": 130.5, "turnover_rate": 1.22}, {"date": "2026-04-02", "open": 1021.0, "close": 949.5, "high": 1030.0, "low": 940.0, "volume": 1399397.0, "turnover": 1344942000.0, "amplitude": 8.49, "pct_change": -10.42, "change": -110.5, "turnover_rate": 0.6}];
+        const zhipuData = [{"date": "2026-03-03", "open": 610.0, "close": 633.0, "high": 637.5, "low": 596.0, "volume": 1605556.0, "turnover": 982011000.0, "amplitude": 6.71, "pct_change": 3.44, "change": 21.0, "turnover_rate": 0.73}, {"date": "2026-03-04", "open": 629.0, "close": 640.0, "high": 655.0, "low": 612.0, "volume": 1635754.0, "turnover": 1024254000.0, "amplitude": 6.79, "pct_change": 1.11, "change": 7.0, "turnover_rate": 0.74}, {"date": "2026-03-05", "open": 640.0, "close": 630.0, "high": 654.0, "low": 615.0, "volume": 1126690.0, "turnover": 713523000.0, "amplitude": 6.09, "pct_change": -1.56, "change": -10.0, "turnover_rate": 0.51}, {"date": "2026-03-06", "open": 627.0, "close": 625.0, "high": 637.0, "low": 613.0, "volume": 618236.0, "turnover": 389614000.0, "amplitude": 3.81, "pct_change": -0.79, "change": -5.0, "turnover_rate": 0.28}, {"date": "2026-03-07", "open": 636.0, "close": 662.5, "high": 665.5, "low": 632.0, "volume": 812068.0, "turnover": 528629000.0, "amplitude": 5.36, "pct_change": 6.0, "change": 37.5, "turnover_rate": 0.37}, {"date": "2026-03-10", "open": 678.0, "close": 738.0, "high": 744.0, "low": 674.5, "volume": 2299174.0, "turnover": 1637668000.0, "amplitude": 10.49, "pct_change": 11.4, "change": 75.5, "turnover_rate": 1.04}, {"date": "2026-03-11", "open": 725.0, "close": 668.0, "high": 735.0, "low": 655.5, "volume": 1685558.0, "turnover": 1155024000.0, "amplitude": 10.77, "pct_change": -9.49, "change": -70.0, "turnover_rate": 0.76}, {"date": "2026-03-12", "open": 658.0, "close": 634.0, "high": 660.0, "low": 610.0, "volume": 1259662.0, "turnover": 791085000.0, "amplitude": 7.49, "pct_change": -5.09, "change": -34.0, "turnover_rate": 0.57}, {"date": "2026-03-13", "open": 632.0, "close": 625.0, "high": 652.0, "low": 625.0, "volume": 554756.0, "turnover": 356753000.0, "amplitude": 4.26, "pct_change": -1.42, "change": -9.0, "turnover_rate": 0.25}, {"date": "2026-03-14", "open": 615.0, "close": 610.0, "high": 635.0, "low": 600.0, "volume": 628476.0, "turnover": 387131000.0, "amplitude": 5.6, "pct_change": -2.4, "change": -15.0, "turnover_rate": 0.28}, {"date": "2026-03-17", "open": 602.0, "close": 620.0, "high": 634.0, "low": 589.0, "volume": 850620.0, "turnover": 518461000.0, "amplitude": 7.38, "pct_change": 1.64, "change": 10.0, "turnover_rate": 0.38}, {"date": "2026-03-18", "open": 619.0, "close": 622.0, "high": 632.5, "low": 605.0, "volume": 650476.0, "turnover": 399710000.0, "amplitude": 4.44, "pct_change": 0.32, "change": 2.0, "turnover_rate": 0.29}, {"date": "2026-03-19", "open": 630.0, "close": 659.0, "high": 660.0, "low": 616.0, "volume": 852804.0, "turnover": 541553000.0, "amplitude": 7.07, "pct_change": 5.95, "change": 37.0, "turnover_rate": 0.39}, {"date": "2026-03-20", "open": 683.0, "close": 630.5, "high": 690.0, "low": 615.0, "volume": 1980638.0, "turnover": 1278107000.0, "amplitude": 11.38, "pct_change": -4.32, "change": -28.5, "turnover_rate": 0.89}, {"date": "2026-03-23", "open": 600.0, "close": 590.0, "high": 633.5, "low": 571.0, "volume": 1783482.0, "turnover": 1065006000.0, "amplitude": 9.91, "pct_change": -6.42, "change": -40.5, "turnover_rate": 0.81}, {"date": "2026-03-24", "open": 618.0, "close": 655.0, "high": 655.0, "low": 595.0, "volume": 1821358.0, "turnover": 1144328000.0, "amplitude": 10.17, "pct_change": 11.02, "change": 65.0, "turnover_rate": 0.82}, {"date": "2026-03-25", "open": 685.0, "close": 760.0, "high": 760.0, "low": 663.0, "volume": 3312577.0, "turnover": 2345635000.0, "amplitude": 14.81, "pct_change": 16.03, "change": 105.0, "turnover_rate": 1.5}, {"date": "2026-03-26", "open": 780.0, "close": 684.0, "high": 790.0, "low": 683.0, "volume": 1879730.0, "turnover": 1359011000.0, "amplitude": 14.08, "pct_change": -10.0, "change": -76.0, "turnover_rate": 0.85}, {"date": "2026-03-27", "open": 684.0, "close": 668.0, "high": 696.0, "low": 641.5, "volume": 1687128.0, "turnover": 1123012000.0, "amplitude": 7.97, "pct_change": -2.34, "change": -16.0, "turnover_rate": 0.76}, {"date": "2026-03-30", "open": 650.5, "close": 733.5, "high": 750.0, "low": 642.5, "volume": 1862526.0, "turnover": 1318398000.0, "amplitude": 16.09, "pct_change": 9.81, "change": 65.5, "turnover_rate": 0.84}, {"date": "2026-03-31", "open": 720.0, "close": 693.5, "high": 755.0, "low": 672.0, "volume": 1510602.0, "turnover": 1059921000.0, "amplitude": 11.32, "pct_change": -5.45, "change": -40.0, "turnover_rate": 0.68}, {"date": "2026-04-01", "open": 797.5, "close": 915.0, "high": 938.0, "low": 797.5, "volume": 5671600.0, "turnover": 4981477000.0, "amplitude": 20.26, "pct_change": 31.94, "change": 221.5, "turnover_rate": 2.56}, {"date": "2026-04-02", "open": 891.5, "close": 779.0, "high": 900.0, "low": 764.0, "volume": 3129684.0, "turnover": 2484313000.0, "amplitude": 14.86, "pct_change": -14.86, "change": -136.0, "turnover_rate": 1.41}];
+        const predictions = [{"id": "pred.20260403T074635Z.000", "created_at": "2026-04-03T07:46:35.651985Z", "symbol": "00100", "direction": "down", "magnitude": "small", "horizon": "1w", "confidence": 0.55, "rationale": "Post-earnings-sympathy-rally pullback. No own catalyst until May earnings. April 2 showed strong selling pressure (-10.4%). Expect consolidation in 900-1000 range. Slightly bearish bias due to mean reversion from April 1 spike and lack of near-term catalyst.", "entry_price": 949.5, "status": "active", "outcome": null, "actual_price": null, "actual_change_pct": null, "evaluated_at": null, "reflection": null}, {"id": "pred.20260403T074635Z.001", "created_at": "2026-04-03T07:46:35.745441Z", "symbol": "02513", "direction": "down", "magnitude": "medium", "horizon": "1w", "confidence": 0.5, "rationale": "Post-first-earnings release. April 1 +32% was the earnings surprise pop, April 2 -15% is profit-taking. Earnings catalyst now priced in. Widening losses (4.72B yuan) may weigh on sentiment. However GLM-5V-Turbo launch provides some support. Expect continued pullback to 700-750 range as initial euphoria fades.", "entry_price": 779.0, "status": "active", "outcome": null, "actual_price": null, "actual_change_pct": null, "evaluated_at": null, "reflection": null}, {"id": "pred.20260403T074635Z.002", "created_at": "2026-04-03T07:46:35.834677Z", "symbol": "00100", "direction": "up", "magnitude": "medium", "horizon": "1m", "confidence": 0.45, "rationale": "1-month view tilts bullish: own earnings ~May 7 could be a catalyst (ARR >50M suggests strong Q1 2026). M2.5 model gaining traction. Analyst consensus target HK,055 provides anchor. Risk: market-wide selloff if macro deteriorates. Low confidence due to extreme volatility and thin data.", "entry_price": 949.5, "status": "active", "outcome": null, "actual_price": null, "actual_change_pct": null, "evaluated_at": null, "reflection": null}, {"id": "pred.20260403T074635Z.003", "created_at": "2026-04-03T07:46:35.936979Z", "symbol": "02513", "direction": "flat", "magnitude": "small", "horizon": "1m", "confidence": 0.4, "rationale": "Earnings catalyst exhausted. Next catalyst unclear. GLM-5 adoption growth needs time to show in revenue. Extremely high valuation (>250x revenue) limits upside. But domestic AI narrative and Huawei chip alignment provide floor. Expect range-bound 650-850 trading. Low confidence - this is the hardest to call.", "entry_price": 779.0, "status": "active", "outcome": null, "actual_price": null, "actual_change_pct": null, "evaluated_at": null, "reflection": null}];
+
+        function formatNum(n) {
+            if (n >= 1e9) return (n/1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+            if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+            return n.toFixed(1);
+        }
+
+        function updateStockCard(prefix, data) {
+            const latest = data[data.length - 1];
+            const prev = data[data.length - 2];
+            const pctChange = latest.pct_change;
+
+            document.getElementById(`${prefix}-price`).textContent = `HK$${latest.close.toFixed(1)}`;
+            const changeEl = document.getElementById(`${prefix}-change`);
+            changeEl.textContent = `${pctChange >= 0 ? '+' : ''}${pctChange.toFixed(2)}%`;
+            changeEl.className = `change ${pctChange >= 0 ? 'up' : 'down'}`;
+
+            document.getElementById(`${prefix}-high`).textContent = latest.high.toFixed(1);
+            document.getElementById(`${prefix}-low`).textContent = latest.low.toFixed(1);
+            document.getElementById(`${prefix}-vol`).textContent = formatNum(latest.volume);
+        }
+
+        function createChart(canvasId, data, color) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const labels = data.map(d => d.date.slice(5));
+            const closes = data.map(d => d.close);
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+            gradient.addColorStop(0, color + '30');
+            gradient.addColorStop(1, color + '05');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '收盘价 (HKD)',
+                        data: closes,
+                        borderColor: color,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { color: '#2a2d3a' },
+                            ticks: { color: '#9ca3af', font: { size: 10 } }
+                        },
+                        y: {
+                            grid: { color: '#2a2d3a' },
+                            ticks: { color: '#9ca3af', font: { size: 10 } }
+                        }
+                    },
+                    interaction: { intersect: false, mode: 'index' }
+                }
+            });
+        }
+
+        function renderPredictions() {
+            const tbody = document.getElementById('predictions-body');
+            const symbolNames = {'00100': 'MiniMax', '02513': '智谱'};
+            const dirNames = {'up': '看涨', 'down': '看跌', 'flat': '震荡'};
+            const magNames = {'small': '小幅(<3%)', 'medium': '中幅(3-8%)', 'large': '大幅(>8%)'};
+
+            predictions.forEach(p => {
+                const dirClass = p.direction === 'up' ? 'badge-up' : (p.direction === 'down' ? 'badge-down' : 'badge-flat');
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-family: monospace; font-size: 12px;">${p.id.split('.').slice(-1)}</td>
+                    <td><strong>${symbolNames[p.symbol] || p.symbol}</strong></td>
+                    <td><span class="badge ${dirClass}">${dirNames[p.direction]}</span></td>
+                    <td>${magNames[p.magnitude]}</td>
+                    <td>${p.horizon}</td>
+                    <td>
+                        <div class="confidence-bar"><div class="confidence-fill" style="width:${p.confidence*100}%"></div></div>
+                        ${(p.confidence*100).toFixed(0)}%
+                    </td>
+                    <td>${p.entry_price ? 'HK$' + p.entry_price.toFixed(1) : '-'}</td>
+                    <td><span class="badge badge-active">${p.status === 'active' ? '待验证' : p.outcome === 'correct' ? '正确' : '��误'}</span></td>
+                    <td style="font-size: 12px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${p.rationale}">${p.rationale}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Initialize
+        updateStockCard('minimax', minimaxData);
+        updateStockCard('zhipu', zhipuData);
+        createChart('minimax-chart', minimaxData, '#6366f1');
+        createChart('zhipu-chart', zhipuData, '#22c55e');
+        renderPredictions();
+    </script>
+</body>
+</html>
