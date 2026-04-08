@@ -1,0 +1,31 @@
+{
+  "total": 8,
+  "evaluated": 2,
+  "active": 6,
+  "accuracy": 0.0,
+  "avg_confidence": 0.525,
+  "brier_score": 0.2762,
+  "total_pnl_pct": -16.7,
+  "avg_pnl_pct": -8.35,
+  "win_rate_pnl": 0.0,
+  "by_horizon": {
+    "1w": {
+      "total": 2,
+      "correct": 0,
+      "accuracy": 0.0
+    }
+  },
+  "by_symbol": {
+    "00100": {
+      "total": 1,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "02513": {
+      "total": 1,
+      "correct": 0,
+      "accuracy": 0.0
+    }
+  },
+  "last_updated": "2026-04-08T11:43:48.519888+00:00"
+}
