@@ -134,5 +134,39 @@
     "actual_change_pct": null,
     "evaluated_at": null,
     "reflection": null
+  },
+  {
+    "id": "pred.20260411T003441Z",
+    "created_at": "2026-04-11T00:34:41.078888+00:00Z",
+    "symbol": "00100",
+    "direction": "up",
+    "magnitude": "small",
+    "horizon": "1w",
+    "confidence": 0.5,
+    "rationale": "Scenario B (talks continue) most likely at 45-50%. Probability-weighted outcome mildly positive. MiniMax lacks own catalyst until May earnings but benefits from sector sentiment. 1100 resistance overhead. Risk: talks fail (15-20%) could push to 920-970.",
+    "entry_price": 1021.0,
+    "status": "active",
+    "outcome": null,
+    "actual_price": null,
+    "actual_change_pct": null,
+    "evaluated_at": null,
+    "reflection": null
+  },
+  {
+    "id": "pred.20260411T003450Z",
+    "created_at": "2026-04-11T00:34:50.039226+00:00Z",
+    "symbol": "02513",
+    "direction": "up",
+    "magnitude": "small",
+    "horizon": "1w",
+    "confidence": 0.55,
+    "rationale": "Scenario B most likely. Zhipu has stronger momentum (3 price hikes, GLM-5.1, pricing power narrative). Applying bias correction: historically underestimate Zhipu upside. 1000 resistance is key level - if breaks through, could accelerate. Even in mild risk-off, pricing power provides floor.",
+    "entry_price": 955.0,
+    "status": "active",
+    "outcome": null,
+    "actual_price": null,
+    "actual_change_pct": null,
+    "evaluated_at": null,
+    "reflection": null
   }
 ]
