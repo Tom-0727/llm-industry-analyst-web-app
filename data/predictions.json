@@ -77,12 +77,12 @@
     "confidence": 0.5,
     "rationale": "MiniMax at 999. Opened 1021 but faded to 999 showing intraday selling pressure. No own catalyst until May earnings. Broad AI sentiment bullish but MiniMax lacks near-term catalyst. Slight upward bias from sector momentum but low conviction. The 1021->999 intraday fade is cautionary. Expect 950-1050 range.",
     "entry_price": 999.0,
-    "status": "active",
-    "outcome": null,
-    "actual_price": null,
-    "actual_change_pct": null,
-    "evaluated_at": null,
-    "reflection": null
+    "status": "evaluated",
+    "outcome": "incorrect",
+    "actual_price": 847.5,
+    "actual_change_pct": -15.16,
+    "evaluated_at": "2026-04-16T00:48:00+00:00Z",
+    "reflection": "WRONG. Predicted MiniMax up small, actual -15.16%. Entry at 999, April 15 close 847.50. Geopolitical shock (Hormuz blockade enforcement, talks failure, ceasefire expiry fear) overwhelmed sector momentum thesis. The 'no own catalyst' risk flagged in rationale materialized via macro — MiniMax had no company-specific buffer against the selloff. Biggest lesson: when macro risk is binary and imminent, low-conviction directional calls are worse than flat/neutral."
   },
   {
     "id": "pred.20260408T114338Z",
@@ -94,12 +94,12 @@
     "confidence": 0.45,
     "rationale": "Zhipu at 868.50. GLM-5.1 + second price hike catalysts now priced in. Concerning intraday reversal: opened 891.50, hit 925, closed 868.50 - 6.1% intraday decline from high. This pattern suggests profit-taking is active despite good news. At 600% YTD, valuation extremely stretched. But pricing power narrative provides floor. Expect consolidation 820-920 range.",
     "entry_price": 868.5,
-    "status": "active",
-    "outcome": null,
-    "actual_price": null,
-    "actual_change_pct": null,
-    "evaluated_at": null,
-    "reflection": null
+    "status": "evaluated",
+    "outcome": "correct",
+    "actual_price": 867.0,
+    "actual_change_pct": -0.17,
+    "evaluated_at": "2026-04-16T00:48:00+00:00Z",
+    "reflection": "CORRECT. Predicted Zhipu flat, actual -0.17% (868.5 to 867). Despite massive intraweek volatility (hit 1005 high on April 13, crashed to 825 low on April 15), the stock ended almost exactly where it started. The 'consolidation 820-920 range' call was accurate. Pricing power narrative provided floor as predicted. However, being right for the wrong reasons: I expected sideways trading, not a V-shaped spike-and-crash pattern."
   },
   {
     "id": "pred.20260408T114341Z",
